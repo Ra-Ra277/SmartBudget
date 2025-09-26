@@ -10,9 +10,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Animate.css -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- AOS (Animate On Scroll) -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <style>
         :root {
             --primary: #4361ee;
+            --primary-light: #6a7ff5;
             --secondary: #3a0ca3;
             --success: #4cc9f0;
             --warning: #f72585;
@@ -21,6 +24,9 @@
             --gray: #6c757d;
             --light-gray: #e9ecef;
             --card-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            --card-shadow-hover: 0 12px 30px rgba(0, 0, 0, 0.15);
+            --gradient-primary: linear-gradient(135deg, var(--primary), var(--secondary));
+            --gradient-success: linear-gradient(135deg, var(--success), #3a86ff);
         }
         
         body {
@@ -29,6 +35,20 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             min-height: 100vh;
             padding-bottom: 2rem;
+            overflow-x: hidden;
+        }
+        
+        .navbar {
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .navbar.scrolled {
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            padding: 0.5rem 0;
         }
         
         .navbar-brand {
@@ -36,6 +56,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            font-size: 1.5rem;
         }
         
         .app-container {
@@ -44,11 +65,11 @@
         }
         
         .header-section {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: var(--gradient-primary);
             color: white;
-            padding: 2.5rem 1.5rem;
-            border-radius: 16px;
-            margin: 1.5rem 0;
+            padding: 3rem 1.5rem;
+            border-radius: 20px;
+            margin: 2rem 0;
             box-shadow: var(--card-shadow);
             position: relative;
             overflow: hidden;
@@ -66,95 +87,149 @@
         }
         
         .app-title {
-            font-size: 2.5rem;
+            font-size: 2.8rem;
             font-weight: 800;
             margin-bottom: 0.5rem;
+            line-height: 1.2;
         }
         
         .tagline {
             font-style: italic;
             opacity: 0.9;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
         }
         
         .card {
             border: none;
-            border-radius: 16px;
+            border-radius: 18px;
             box-shadow: var(--card-shadow);
-            margin-bottom: 1.5rem;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 1.8rem;
+            transition: all 0.4s ease;
             overflow: hidden;
+            background-color: white;
         }
         
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+            transform: translateY(-8px);
+            box-shadow: var(--card-shadow-hover);
         }
         
         .card-header {
             background: white;
             border-bottom: 1px solid var(--light-gray);
             font-weight: 600;
-            padding: 1.25rem;
+            padding: 1.5rem;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            font-size: 1.1rem;
         }
         
         .card-body {
-            padding: 1.5rem;
+            padding: 1.8rem;
         }
         
         .profile-option {
             text-align: center;
-            padding: 1.5rem 1rem;
+            padding: 2rem 1rem;
             border: 2px solid var(--light-gray);
-            border-radius: 12px;
+            border-radius: 15px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.4s ease;
             height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .profile-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-primary);
+            opacity: 0;
+            transition: all 0.4s ease;
+            z-index: 0;
         }
         
         .profile-option:hover {
             border-color: var(--primary);
-            background-color: rgba(67, 97, 238, 0.05);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(67, 97, 238, 0.15);
+        }
+        
+        .profile-option:hover::before {
+            left: 0;
+            opacity: 0.05;
         }
         
         .profile-option.active {
             border-color: var(--primary);
             background-color: rgba(67, 97, 238, 0.1);
             transform: scale(1.03);
+            box-shadow: 0 10px 25px rgba(67, 97, 238, 0.2);
         }
         
         .profile-option i {
-            font-size: 2rem;
-            margin-bottom: 1rem;
+            font-size: 2.5rem;
+            margin-bottom: 1.2rem;
             color: var(--primary);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .profile-option div {
+            position: relative;
+            z-index: 1;
+            font-weight: 600;
         }
         
         .summary-box {
             text-align: center;
-            padding: 2rem;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 2.5rem;
+            background: var(--gradient-primary);
             color: white;
-            border-radius: 16px;
-            margin-bottom: 1.5rem;
+            border-radius: 18px;
+            margin-bottom: 1.8rem;
             box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .summary-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(25deg);
         }
         
         .summary-amount {
-            font-size: 2.5rem;
+            font-size: 3rem;
             font-weight: 800;
-            margin: 0.5rem 0;
+            margin: 0.8rem 0;
+            position: relative;
+            z-index: 1;
         }
         
         .allocation-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
             border-bottom: 1px solid var(--light-gray);
+            transition: all 0.3s ease;
+        }
+        
+        .allocation-item:hover {
+            transform: translateX(5px);
         }
         
         .allocation-value {
@@ -163,111 +238,222 @@
         }
         
         .progress {
-            height: 10px;
-            border-radius: 5px;
-            margin-top: 0.5rem;
+            height: 12px;
+            border-radius: 8px;
+            margin-top: 0.8rem;
+            background-color: var(--light-gray);
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            border-radius: 8px;
+            transition: width 1s ease-in-out;
         }
         
         .chart-container {
-            height: 200px;
-            margin-top: 1.5rem;
+            height: 220px;
+            margin-top: 1.8rem;
             display: flex;
             align-items: flex-end;
-            gap: 12px;
-            padding: 0 1rem;
+            gap: 15px;
+            padding: 0 1.5rem;
         }
         
         .chart-bar {
             flex: 1;
-            background: linear-gradient(to top, var(--primary), var(--secondary));
-            border-radius: 8px 8px 0 0;
+            background: var(--gradient-primary);
+            border-radius: 10px 10px 0 0;
             position: relative;
-            transition: height 0.5s ease;
+            transition: height 0.8s ease;
+            cursor: pointer;
+        }
+        
+        .chart-bar:hover {
+            opacity: 0.9;
+            transform: scaleY(1.05);
+            transform-origin: bottom;
         }
         
         .chart-label {
             position: absolute;
-            bottom: -30px;
+            bottom: -35px;
             width: 100%;
             text-align: center;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             font-weight: 500;
         }
         
         .ai-recommendation {
             background-color: rgba(76, 201, 240, 0.15);
-            padding: 1.25rem;
-            border-radius: 12px;
-            margin-top: 1.5rem;
-            border-left: 4px solid var(--success);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-top: 1.8rem;
+            border-left: 5px solid var(--success);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ai-recommendation::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-success);
+            opacity: 0.05;
+            z-index: 0;
         }
         
         .recommendation-title {
             font-weight: 600;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.8rem;
             color: var(--dark);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .ai-recommendation p {
+            position: relative;
+            z-index: 1;
+            margin-bottom: 0;
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: var(--gradient-primary);
             border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 10px;
+            padding: 0.9rem 1.8rem;
+            border-radius: 12px;
             font-weight: 600;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: all 0.6s ease;
         }
         
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(67, 97, 238, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.4);
+        }
+        
+        .btn-primary:hover::before {
+            left: 100%;
         }
         
         .floating-notification {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
+            bottom: 25px;
+            right: 25px;
             background: white;
-            padding: 1rem 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            padding: 1.2rem 1.8rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             z-index: 1000;
-            animation: fadeInUp 0.5s ease;
+            animation: slideInRight 0.5s ease;
+            max-width: 350px;
         }
         
-        @keyframes fadeInUp {
+        @keyframes slideInRight {
             from {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateX(100px);
             }
             to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateX(0);
             }
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
         }
         
         .custom-range::-webkit-slider-thumb {
             background: var(--primary);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
         }
         
         .custom-range::-moz-range-thumb {
             background: var(--primary);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: none;
         }
         
         .custom-tooltip {
             --bs-tooltip-bg: var(--primary);
         }
         
+        .form-control, .form-select {
+            border-radius: 10px;
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--light-gray);
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+        }
+        
+        .nav-link {
+            position: relative;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 80%;
+        }
+        
         /* Animation classes */
         .animate-on-scroll {
             opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.6s ease, transform 0.6s ease;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
         }
         
         .animate-on-scroll.animated {
@@ -275,25 +461,82 @@
             transform: translateY(0);
         }
         
+        /* Loading animation */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .app-title {
+                font-size: 2.2rem;
+            }
+            
+            .chart-container {
+                height: 200px;
+                gap: 10px;
+            }
+            
+            .chart-label {
+                font-size: 0.8rem;
+                bottom: -30px;
+            }
+            
+            .header-section {
+                padding: 2rem 1rem;
+            }
+            
+            .summary-amount {
+                font-size: 2.5rem;
+            }
+            
+            .profile-option {
+                padding: 1.5rem 0.5rem;
+            }
+            
+            .profile-option i {
                 font-size: 2rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .app-title {
+                font-size: 1.8rem;
+            }
+            
+            .tagline {
+                font-size: 1rem;
             }
             
             .chart-container {
                 height: 180px;
             }
             
-            .chart-label {
-                font-size: 0.75rem;
+            .allocation-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .allocation-value {
+                margin-top: 0.5rem;
             }
         }
     </style>
 </head>
 <body>
     <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
         <div class="container">
             <a class="navbar-brand" href="#">
                 <i class="fas fa-wallet text-primary"></i>
@@ -321,16 +564,19 @@
         </div>
     </nav>
 
-    <div class="app-container">
+    <div class="app-container mt-5 pt-4">
         <!-- Header Section -->
-        <div class="header-section animate-on-scroll">
+        <div class="header-section" data-aos="fade-up">
             <div class="row align-items-center">
                 <div class="col-md-8">
                     <h1 class="app-title">Kelola Keuangan dengan Lebih Pintar</h1>
                     <p class="tagline">"Atur pengeluaran sesuai kebutuhan, bukan sekadar mencatat"</p>
+                    <button class="btn btn-light btn-lg mt-2">
+                        <i class="fas fa-play-circle me-2"></i>Lihat Demo
+                    </button>
                 </div>
                 <div class="col-md-4 text-center">
-                    <i class="fas fa-chart-line fa-5x opacity-75"></i>
+                    <i class="fas fa-chart-line fa-5x opacity-75 pulse-animation"></i>
                 </div>
             </div>
         </div>
@@ -339,13 +585,13 @@
             <!-- Left Panel -->
             <div class="col-lg-4">
                 <!-- Income Input Card -->
-                <div class="card animate-on-scroll" data-delay="100">
+                <div class="card" data-aos="fade-right" data-aos-delay="100">
                     <div class="card-header">
                         <i class="fas fa-money-bill-wave text-primary"></i>
                         <span>Input Pemasukan</span>
                     </div>
                     <div class="card-body">
-                        <div class="mb-3">
+                        <div class="mb-4">
                             <label for="income" class="form-label">Jumlah Pemasukan (Rp)</label>
                             <input type="number" class="form-control form-control-lg" id="income" placeholder="Contoh: 1000000" value="1000000">
                         </div>
@@ -362,7 +608,7 @@
                 </div>
                 
                 <!-- Profile Selection Card -->
-                <div class="card animate-on-scroll" data-delay="200">
+                <div class="card" data-aos="fade-right" data-aos-delay="200">
                     <div class="card-header">
                         <i class="fas fa-user text-primary"></i>
                         <span>Profil Pengguna</span>
@@ -398,7 +644,7 @@
                 </div>
                 
                 <!-- AI Recommendation Card -->
-                <div class="card animate-on-scroll" data-delay="300">
+                <div class="card" data-aos="fade-right" data-aos-delay="300">
                     <div class="card-header">
                         <i class="fas fa-robot text-primary"></i>
                         <span>Rekomendasi AI</span>
@@ -418,14 +664,14 @@
             <!-- Right Panel -->
             <div class="col-lg-8">
                 <!-- Summary Box -->
-                <div class="summary-box animate-on-scroll" data-delay="100">
+                <div class="summary-box" data-aos="fade-left" data-aos-delay="100">
                     <div class="summary-title">Total Pemasukan</div>
                     <div class="summary-amount" id="totalIncome">Rp 1.000.000</div>
                     <div>Per bulan</div>
                 </div>
                 
                 <!-- Allocation Card -->
-                <div class="card animate-on-scroll" data-delay="200">
+                <div class="card" data-aos="fade-left" data-aos-delay="200">
                     <div class="card-header">
                         <i class="fas fa-chart-pie text-primary"></i>
                         <span>Rekomendasi Alokasi</span>
@@ -482,7 +728,7 @@
                 </div>
                 
                 <!-- Visualization Card -->
-                <div class="card animate-on-scroll" data-delay="300">
+                <div class="card" data-aos="fade-left" data-aos-delay="300">
                     <div class="card-header">
                         <i class="fas fa-chart-bar text-primary"></i>
                         <span>Visualisasi Pengeluaran</span>
@@ -511,28 +757,40 @@
         </div>
         
         <!-- Daily Needs Card -->
-        <div class="card animate-on-scroll" data-delay="400">
+        <div class="card" data-aos="fade-up" data-aos-delay="400">
             <div class="card-header">
                 <i class="fas fa-list text-primary"></i>
                 <span>Daftar Kebutuhan Harian</span>
             </div>
             <div class="card-body">
                 <p>Fitur ini akan membantu Anda melacak pengeluaran harian dan memberikan notifikasi ketika anggaran hampir habis.</p>
-                <button class="btn btn-primary mt-3">Kelola Kebutuhan</button>
+                <button class="btn btn-primary mt-3">
+                    <i class="fas fa-cog me-2"></i>Kelola Kebutuhan
+                </button>
             </div>
         </div>
     </div>
 
     <!-- Bootstrap 5 JS with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- AOS Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize AOS
+            AOS.init({
+                duration: 800,
+                once: true,
+                offset: 100
+            });
+            
             const incomeInput = document.getElementById('income');
             const profileOptions = document.querySelectorAll('.profile-option');
             const totalIncomeElement = document.getElementById('totalIncome');
             const allocationList = document.getElementById('allocationList');
             const aiRecommendationText = document.getElementById('aiRecommendationText');
             const chartBars = document.querySelectorAll('.chart-bar');
+            const navbar = document.querySelector('.navbar');
             
             // Data alokasi berdasarkan profil
             const allocationProfiles = {
@@ -577,6 +835,15 @@
                 }
             };
             
+            // Navbar scroll effect
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+            
             // Event listener untuk input pemasukan
             incomeInput.addEventListener('input', updateAllocations);
             
@@ -601,25 +868,32 @@
                 const selectedProfile = document.querySelector('.profile-option.active').dataset.profile;
                 const allocations = allocationProfiles[selectedProfile].allocations;
                 
-                // Update total pemasukan
-                totalIncomeElement.textContent = `Rp ${income.toLocaleString('id-ID')}`;
+                // Update total pemasukan dengan animasi
+                animateValue(totalIncomeElement, 0, income, 1000);
                 
                 // Update daftar alokasi
                 allocationList.innerHTML = '';
-                allocations.forEach(allocation => {
+                allocations.forEach((allocation, index) => {
                     const amount = (income * allocation.percentage / 100);
                     const allocationItem = document.createElement('div');
-                    allocationItem.className = 'allocation-item animate__animated animate__fadeIn';
+                    allocationItem.className = 'allocation-item';
+                    allocationItem.style.animationDelay = `${index * 100}ms`;
                     allocationItem.innerHTML = `
                         <div>${allocation.name}</div>
                         <div class="allocation-value">Rp ${amount.toLocaleString('id-ID')} (${allocation.percentage}%)</div>
                         <div class="w-100">
                             <div class="progress">
-                                <div class="progress-bar" style="width: ${allocation.percentage}%; background-color: ${allocation.color}"></div>
+                                <div class="progress-bar" style="width: 0%; background-color: ${allocation.color}" data-target="${allocation.percentage}"></div>
                             </div>
                         </div>
                     `;
                     allocationList.appendChild(allocationItem);
+                    
+                    // Animate progress bar
+                    setTimeout(() => {
+                        const progressBar = allocationItem.querySelector('.progress-bar');
+                        progressBar.style.width = `${allocation.percentage}%`;
+                    }, 300 + (index * 100));
                 });
                 
                 // Update chart
@@ -629,14 +903,31 @@
                 updateAIRecommendation(income, selectedProfile);
             }
             
+            // Fungsi animasi nilai
+            function animateValue(element, start, end, duration) {
+                let startTimestamp = null;
+                const step = (timestamp) => {
+                    if (!startTimestamp) startTimestamp = timestamp;
+                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                    const value = Math.floor(progress * (end - start) + start);
+                    element.textContent = `Rp ${value.toLocaleString('id-ID')}`;
+                    if (progress < 1) {
+                        window.requestAnimationFrame(step);
+                    }
+                };
+                window.requestAnimationFrame(step);
+            }
+            
             // Fungsi untuk memperbarui chart
             function updateChart(allocations) {
                 chartBars.forEach((bar, index) => {
                     if (allocations[index]) {
                         const percentage = allocations[index].percentage;
-                        bar.style.height = `${percentage}%`;
-                        bar.style.background = `linear-gradient(to top, ${allocations[index].color}, ${allocations[index].color}99)`;
-                        bar.querySelector('.chart-label').textContent = allocations[index].name;
+                        setTimeout(() => {
+                            bar.style.height = `${percentage}%`;
+                            bar.style.background = `linear-gradient(to top, ${allocations[index].color}, ${allocations[index].color}99)`;
+                            bar.querySelector('.chart-label').textContent = allocations[index].name;
+                        }, index * 150);
                     }
                 });
             }
@@ -662,32 +953,16 @@
                     recommendation += ' Sebagai ibu rumah tangga, pertimbangkan untuk membuat perencanaan menu mingguan untuk mengoptimalkan anggaran belanja.';
                 }
                 
-                aiRecommendationText.textContent = recommendation;
-            }
-            
-            // Animasi scroll
-            function animateOnScroll() {
-                const elements = document.querySelectorAll('.animate-on-scroll');
-                elements.forEach(element => {
-                    const elementPosition = element.getBoundingClientRect().top;
-                    const screenPosition = window.innerHeight / 1.3;
-                    
-                    if (elementPosition < screenPosition) {
-                        const delay = element.getAttribute('data-delay') || 0;
-                        setTimeout(() => {
-                            element.classList.add('animated');
-                        }, delay);
-                    }
-                });
+                // Animate text change
+                aiRecommendationText.style.opacity = 0;
+                setTimeout(() => {
+                    aiRecommendationText.textContent = recommendation;
+                    aiRecommendationText.style.opacity = 1;
+                }, 300);
             }
             
             // Inisialisasi pertama
             updateAllocations();
-            
-            // Event listener untuk scroll
-            window.addEventListener('scroll', animateOnScroll);
-            // Trigger once on load
-            animateOnScroll();
             
             // Tampilkan notifikasi
             setTimeout(() => {
@@ -696,16 +971,33 @@
                 notification.innerHTML = `
                     <i class="fas fa-bell text-primary"></i>
                     <div>Selamat datang di SmartBudget! Mulai kelola keuangan Anda sekarang.</div>
+                    <button type="button" class="btn-close ms-auto" aria-label="Close"></button>
                 `;
                 document.body.appendChild(notification);
                 
-                // Hapus notifikasi setelah 5 detik
-                setTimeout(() => {
+                // Close button functionality
+                notification.querySelector('.btn-close').addEventListener('click', function() {
+                    notification.classList.remove('animate__fadeInUp');
                     notification.classList.add('animate__fadeOutDown');
                     setTimeout(() => {
-                        document.body.removeChild(notification);
+                        if (document.body.contains(notification)) {
+                            document.body.removeChild(notification);
+                        }
                     }, 500);
-                }, 5000);
+                });
+                
+                // Hapus notifikasi setelah 8 detik
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        notification.classList.remove('animate__fadeInUp');
+                        notification.classList.add('animate__fadeOutDown');
+                        setTimeout(() => {
+                            if (document.body.contains(notification)) {
+                                document.body.removeChild(notification);
+                            }
+                        }, 500);
+                    }
+                }, 8000);
             }, 1500);
         });
     </script>
